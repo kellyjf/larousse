@@ -24,18 +24,26 @@ def main():
 				if lienson:
 					ls=lienson[0].attrib['href']
 				if gram:
-					g1=gram[0].text_content()
+					g1=gram[0].text_content().encode('utf-8')
 				if phones:
-					ph=phones[1].text_content()
+					ph=phones[1].text_content().encode('utf-8')
 				if adr:
-					a1=adr[0].text_content()
-				print "LIEN", ph,ls,g1,"ADR:",a1
+					a1=adr[0].text_content().encode('utf-8')
+				print "LIEN", ph,ls,g1,"ADR:",a1,"TYPE",type(ls),type(g1),type(ph),type(adr)
+				if False:
+					examples=ze.xpath("..//li[@class='itemZONESEM']")
+					if not examples:
+						examples=ze.xpath("..//div[@class='ZoneTexte']")
 
-				examples=ze.xpath("..//li[@class='itemZONESEM']")
+				examples=[x.getparent() for x in ze.xpath("..//span[@class='Indicateur']")]
+				if not examples:
+					examples=ze.xpath("..//div[@class='ZoneTexte']")
+					examples=examples+ze.xpath("..//div[@class='ZoneTexte1']")
+
 				for example in examples:
 					indic=example.xpath("span[@class='Indicateur']")
 					if indic:
-						i1="".join([x.text_content() for x in indic])
+						i1="".join([x.text_content().encode('utf-8') for x in indic])
 						print "INDIC",i1
 					exprs=example.xpath("div[@class='ZoneExpression1']") +  example.xpath("div[@class='ZoneExpression']")
 					for expr in exprs:
@@ -44,9 +52,9 @@ def main():
 						lien3=expr.xpath("a[@class='lienson3']")
 						l2=t2=l3=None
 						if loc2:
-							l2="".join([x.text_content() for x in loc2])
+							l2="".join([x.text_content().encode('utf-8') for x in loc2])
 						if trad2:
-							t2="".join([x.text_content() for x in trad2])
+							t2="".join([x.text_content().encode('utf-8') for x in trad2])
 						if lien3:
 							l3="".join([x.attrib['href'] for x in lien3])
 						print "EXAMPLE", l3,l2,t2
