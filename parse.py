@@ -5,6 +5,19 @@ import sys
 import os
 import signal
 import argparse as ap
+import requests
+
+def getaudio(relpath):
+	base="https://www.larousse.fr/"
+	name=relpath.split("/")[-1]
+	afile=args.audio_dir+"/"+name
+	if not os.path.exists(afile):
+		print "GET",base+relpath
+		resp=requests.get(base+relpath)
+		print "GET",resp.status_code
+		if resp.status_code==200:
+			with open(afile,"w") as f:
+				f.write(resp.content)
 
 
 	
@@ -30,6 +43,9 @@ def main():
 				if adr:
 					a1=adr[0].text_content().encode('utf-8')
 				print "LIEN", ph,ls,g1,"ADR:",a1,"TYPE",type(ls),type(g1),type(ph),type(adr)
+				if args.audio:
+					getaudio(ls)
+
 				if False:
 					examples=ze.xpath("..//li[@class='itemZONESEM']")
 					if not examples:
@@ -58,6 +74,8 @@ def main():
 						if lien3:
 							l3="".join([x.attrib['href'] for x in lien3])
 						print "EXAMPLE", l3,l2,t2
+						if args.audio:
+							getaudio(l3)
 			return tree
 	
 
@@ -67,6 +85,8 @@ if __name__ == "__main__":
 	parser = ap.ArgumentParser()
 	parser.add_argument("words", nargs="*", default=['avoir'])
 	parser.add_argument("--word-dir", default="words")
+	parser.add_argument("--audio-dir", default="audio")
+	parser.add_argument("--audio", action="store_true")
 	parser.add_argument("--debug", action="store_true")
 	args=parser.parse_args()
 	print args	
