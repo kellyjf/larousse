@@ -89,5 +89,9 @@ if __name__ == "__main__":
 	parser.add_argument("--audio", action="store_true")
 	parser.add_argument("--debug", action="store_true")
 	args=parser.parse_args()
-	print args	
+
+        for d in [ args.audio_dir, args.word_dir ]:
+                if not os.path.exists(d):
+                    os.makedirs(d)
+
 	main()

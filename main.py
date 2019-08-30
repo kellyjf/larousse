@@ -16,8 +16,9 @@ def main():
 		tfile=args.word_dir+"/"+word
 		if not os.path.exists(tfile):
 			pg=requests.get(base+word+"/")
-			with open(tfile,"w") as f:
-				f.write(pg.text.encode('utf-8'))
+                        if pg.status_code==200:
+                            with open(tfile,"w") as f:
+                                    f.write(pg.text.encode('utf-8'))
 			
 
 if __name__ == "__main__":
@@ -28,5 +29,7 @@ if __name__ == "__main__":
 	parser.add_argument("--debug", action="store_true")
 	args=parser.parse_args()
 
+        if not os.path.exists(args.word_dir):
+            os.makedirs(args.word_dir)
 	main()
 	
