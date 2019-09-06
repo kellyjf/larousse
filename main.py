@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import requests
 from lxml import html
@@ -9,17 +9,24 @@ import argparse as ap
 
 base="https://www.larousse.fr/dictionnaires/francais-anglais/"
 
+def get_tree(word):
+	tree=None
+	tfile=args.word_dir+"/"+word
+	if not os.path.exists(tfile):
+		pg=requests.get(base+word+"/")
+		if pg.status_code==200:
+			with open(tfile,"w") as f:
+				f.write(pg.text)
+	with open(tfile,"r") as f:
+		tree=html.fromstring(f.read())
+
+	return tree
+
 def main():
 	
-	print args.words
+	print(args.words)
 	for word in args.words:
-		tfile=args.word_dir+"/"+word
-		if not os.path.exists(tfile):
-			pg=requests.get(base+word+"/")
-                        if pg.status_code==200:
-                            with open(tfile,"w") as f:
-                                    f.write(pg.text.encode('utf-8'))
-			
+		print(get_tree(word))
 
 if __name__ == "__main__":
 
@@ -29,7 +36,7 @@ if __name__ == "__main__":
 	parser.add_argument("--debug", action="store_true")
 	args=parser.parse_args()
 
-        if not os.path.exists(args.word_dir):
-            os.makedirs(args.word_dir)
+	if not os.path.exists(args.word_dir):
+		os.makedirs(args.word_dir)
 	main()
 	
