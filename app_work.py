@@ -8,8 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import requests
-from lxml import html
+from local import get_tree
 
 class Web(QtCore.QObject):
 
@@ -17,13 +16,10 @@ class Web(QtCore.QObject):
 
 	def __init__(self, parent=None):
 		super(QtCore.QObject,self).__init__(parent)
-		self.base="https://www.larousse.fr/dictionnaires/francais-anglais"
 
 	def load(self, word):
-		req=requests.get("{0}/{1}".format(self.base,word))
-		if req.status_code==200:
-			tree=html.fromstring(req.content)
-			print(tree)			
+		tree=get_tree(word)
+		print(tree)			
 		self.loaded.emit()
 
 if __name__ == "__main__":

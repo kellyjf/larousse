@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from lxml import html
 import sys
@@ -6,81 +6,87 @@ import os
 import signal
 import argparse as ap
 import requests
+from local import get_tree
 
 def getaudio(relpath):
 	base="https://www.larousse.fr/"
 	name=relpath.split("/")[-1]
 	afile=args.audio_dir+"/"+name
 	if not os.path.exists(afile):
-		print "GET",base+relpath
+		#print "GET",base+relpath
 		resp=requests.get(base+relpath)
-		print "GET",resp.status_code
+		#print "GET",resp.status_code
 		if resp.status_code==200:
 			with open(afile,"w") as f:
 				f.write(resp.content)
 
+class Entry:
+	def __init__(self, tree=None):
+		self.db={}
+		if tree is not None:
+			self.load(tree)
 
-	
-def main():
-	
-	for word in args.words:
-		tfile=args.word_dir+"/"+word
-		if os.path.exists(tfile):
-			tree=html.parse(tfile)
-			zes=tree.xpath("//div[@class='ZoneEntree']")
-			for ze in zes:
-				ls=ph=g1=a1=None
-				lienson=ze.xpath("a[@class='lienson']")
-				gram=ze.xpath("div[@class='ZoneGram']")
-				phones=ze.xpath("span[@class='Phonetique']")
-				adr=ze.xpath("h2[@class='Adresse']")
-				if lienson:
-					ls=lienson[0].attrib['href']
-				if gram:
-					g1=gram[0].text_content().encode('utf-8')
-				if phones:
-					ph=phones[1].text_content().encode('utf-8')
-				if adr:
-					a1=adr[0].text_content().encode('utf-8')
-				print "LIEN", ph,ls,g1,"ADR:",a1,"TYPE",type(ls),type(g1),type(ph),type(adr)
-				if args.audio:
-					getaudio(ls)
+	def __repr__(self):
+		return "{0} {1} {2}".format(self.address,self.ipa,self.part)
 
-				if False:
-					examples=ze.xpath("..//li[@class='itemZONESEM']")
-					if not examples:
-						examples=ze.xpath("..//div[@class='ZoneTexte']")
+	def load(self, tree):
+		self.db={}
+		self.zones=[]
+		zes=tree.xpath("//div[@class='ZoneEntree']")
+		for ze in zes:
+			zdict={ 'indics':[], 'lienson':None, 'part': None, 'ipa':None, 'address':None}
+			self.zones.append(zdict)
+			lienson=ze.xpath("a[@class='lienson']")
+			gram=ze.xpath("div[@class='ZoneGram']")
+			phones=ze.xpath("span[@class='Phonetique']")
+			adr=ze.xpath("h2[@class='Adresse']")
+			if lienson:
+				zdict['lienson']=lienson[0].attrib['href']
+			if gram:
+				zdict['part']=gram[0].text_content()
+			if phones:
+				zdict['ipa']=phones[1].text_content()
+			if adr:
+				zdict['address']=adr[0].text_content()
 
-				examples=[x.getparent() for x in ze.xpath("..//span[@class='Indicateur']")]
-				if not examples:
-					examples=ze.xpath("..//div[@class='ZoneTexte']")
-					examples=examples+ze.xpath("..//div[@class='ZoneTexte1']")
-
-				for example in examples:
-					indic=example.xpath("span[@class='Indicateur']")
-					if indic:
-						i1="".join([x.text_content().encode('utf-8') for x in indic])
-						print "INDIC",i1
-					exprs=example.xpath("div[@class='ZoneExpression1']") +  example.xpath("div[@class='ZoneExpression']")
-					for expr in exprs:
-						loc2=expr.xpath("span[@class='Locution2']")
-						trad2=expr.xpath("span[@class='Traduction2']")
-						lien3=expr.xpath("a[@class='lienson3']")
-						l2=t2=l3=None
-						if loc2:
-							l2="".join([x.text_content().encode('utf-8') for x in loc2])
-						if trad2:
-							t2="".join([x.text_content().encode('utf-8') for x in trad2])
-						if lien3:
-							l3="".join([x.attrib['href'] for x in lien3])
-						print "EXAMPLE", l3,l2,t2
-						if args.audio:
-							getaudio(l3)
-			return tree
-	
+			if args.audio:
+				getaudio(ls)
 
 
+			examples=[x.getparent() for x in ze.xpath("..//span[@class='Indicateur']")]
+			if not examples:
+				examples=ze.xpath("..//div[@class='ZoneTexte']")
+				examples=examples+ze.xpath("..//div[@class='ZoneTexte1']")
 
+			for example in examples:
+				edict={ 'expressions':[] }
+				zdict['indics'].append(edict)
+				indic=example.xpath("span[@class='Indicateur']")
+				if indic:
+					i1="".join([x.text_content() for x in indic])
+					edict['indic']=i1
+				exprs=example.xpath("div[@class='ZoneExpression1']") +  example.xpath("div[@class='ZoneExpression']")
+				for expr in exprs:
+					xdict={}
+					loc2=expr.xpath("span[@class='Locution2']")
+					trad2=expr.xpath("span[@class='Traduction2']")
+					lien3=expr.xpath("a[@class='lienson3']")
+					l2=t2=l3=None
+					if loc2:
+						l2="".join([x.text_content() for x in loc2])
+					if trad2:
+						t2="".join([x.text_content() for x in trad2])
+					if lien3:
+						l3="".join([x.attrib['href'] for x in lien3])
+					xdict['locution']=l2
+					xdict['traduction']=t2
+					xdict['lienson']=l3
+					edict['expressions'].append(xdict)
+
+					#print "EXAMPLE", l3,l2,t2
+					if args.audio:
+						getaudio(l3)
+		
 if __name__ == "__main__":
 	parser = ap.ArgumentParser()
 	parser.add_argument("words", nargs="*", default=['avoir'])
@@ -90,8 +96,16 @@ if __name__ == "__main__":
 	parser.add_argument("--debug", action="store_true")
 	args=parser.parse_args()
 
-        for d in [ args.audio_dir, args.word_dir ]:
-                if not os.path.exists(d):
-                    os.makedirs(d)
+	for d in [ args.audio_dir, args.word_dir ]:
+		if not os.path.exists(d):
+			os.makedirs(d)
 
-	main()
+	for word in args.words:
+		tree=get_tree(word)
+		e=Entry(tree)
+		for zone in e.zones:
+			print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
+			for indic in zone.get('indics'):
+				print("\t",indic.get('indic'))
+				for expr in indic.get('expressions'):
+					print("\t\t",expr.get('locution'))
