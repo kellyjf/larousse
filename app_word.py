@@ -10,17 +10,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from ui_word import Ui_Word
 import time
+from app_work import Web
 
-class Web(QtCore.QObject):
-	loaded=QtCore.pyqtSignal()
-
-	def __init__(self, parent=None):
-		super(QtCore.QObject,self).__init__(parent)
-
-	def run(self):
-		time.sleep(20)
-		self.loaded.emit()
-	
 class Word(QtWidgets.QDialog, Ui_Word):
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
@@ -30,10 +21,18 @@ class Word(QtWidgets.QDialog, Ui_Word):
 		self.web.moveToThread(self.thread)
 		self.web.loaded.connect(self.loaded)
 		self.thread.start()
-		self.loadButton.clicked.connect(self.web.run)
+		self.loadButton.clicked.connect(self.load)
+
+	def load(self):
+		name=self.findCombo.currentText()
+		self.web.load(name)
 
 	def loaded(self):
 		print("Loaded")
+		for zone in self.web.entry.zones:
+			self.mainTable.insertRow(0)
+			self.mainTable.setItem(0,0,QtWidgets.QTableWidgetItem(zone.get('address')))
+			self.mainTable.setItem(0,1,QtWidgets.QTableWidgetItem(zone.get('ipa')))	
 
 
 

@@ -9,6 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from local import get_tree
+from parse import Entry
 
 class Web(QtCore.QObject):
 
@@ -16,10 +17,11 @@ class Web(QtCore.QObject):
 
 	def __init__(self, parent=None):
 		super(QtCore.QObject,self).__init__(parent)
+		self.entry=None
 
 	def load(self, word):
 		tree=get_tree(word)
-		print(tree)			
+		self.entry=Entry(tree)
 		self.loaded.emit()
 
 if __name__ == "__main__":

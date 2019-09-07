@@ -8,6 +8,8 @@ import argparse as ap
 import requests
 from local import get_tree
 
+_audio = False
+
 def getaudio(relpath):
 	base="https://www.larousse.fr/"
 	name=relpath.split("/")[-1]
@@ -27,7 +29,7 @@ class Entry:
 			self.load(tree)
 
 	def __repr__(self):
-		return "{0} {1} {2}".format(self.address,self.ipa,self.part)
+		return ",".join("{0}:{1}".format(x.get('address'),x.get('ipa')) for x in self.zones) 
 
 	def load(self, tree):
 		self.db={}
@@ -49,7 +51,7 @@ class Entry:
 			if adr:
 				zdict['address']=adr[0].text_content()
 
-			if args.audio:
+			if _audio:
 				getaudio(ls)
 
 
@@ -84,7 +86,7 @@ class Entry:
 					edict['expressions'].append(xdict)
 
 					#print "EXAMPLE", l3,l2,t2
-					if args.audio:
+					if _audio:
 						getaudio(l3)
 		
 if __name__ == "__main__":
