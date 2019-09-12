@@ -1,6 +1,6 @@
 
 
-UI := ui_word.py
+UI := ui_word.py ui_vowels.py
 
 ifneq ($(NUM),)
 NOPT := --number $(NUM)
@@ -14,5 +14,6 @@ ui_%.py : %.ui
 	pyuic5 -i 0 $< > $@
 
 test: $(UI)
-	python3 app_word.py
+	python3 app_vowels.py
+	#python3 app_word.py
 
