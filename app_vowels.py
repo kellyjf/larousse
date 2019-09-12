@@ -14,22 +14,46 @@ class Sub(QtWidgets.QHBoxLayout):
 	def __init__(self, parent, lblunr, lblrnd):
 		super(QtWidgets.QHBoxLayout, self).__init__(parent)
 
-		unr=QtWidgets.QPushButton(parent)
-		unr.setText(lblunr)
-		rnd=QtWidgets.QPushButton(parent)
-		rnd.setText(lblrnd)
+		if lblunr:
+			unr=QtWidgets.QPushButton(parent)
+			unr.setText(lblunr)
+			unr.setStyleSheet("background-color: rgb(180,180,200);")
+			self.addWidget(unr)
+		if lblrnd:
+			rnd=QtWidgets.QPushButton(parent)
+			rnd.setStyleSheet("background-color: rgb(200,180,180);")
+			rnd.setText(lblrnd)
+			self.addWidget(rnd)
 	
-		self.addWidget(unr)
-		self.addWidget(rnd)
 	
 class Vowels(QtWidgets.QDialog, Ui_Vowels):
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
-		self.gridLayout.addLayout(Sub(self,'i','y'),0,0,1,1)
-		self.gridLayout.addLayout(Sub(self,'e','ø'),1,1,1,1)
-		self.gridLayout.addLayout(Sub(self,"\u025b","\u0153"),2,2,1,1)
-		self.gridLayout.addLayout(Sub(self,"\u0061","\u0276"),3,3,1,1)
+		row=0
+		self.gridLayout.addLayout(Sub(self,'i','y'),row,0,1,1)
+		self.gridLayout.addLayout(Sub(self,None,"u"),row,4,1,1)
+
+		row=row+1
+		self.gridLayout.addLayout(Sub(self,'e','ø'),row,1,1,1)
+		self.gridLayout.addLayout(Sub(self,"\u0259",None),row,3,1,1)
+		self.gridLayout.addLayout(Sub(self,None,"o"),row,4,1,1)
+
+		row=row+1
+		self.gridLayout.addLayout(Sub(self,"\u025b","\u0153"),row,2,1,1)
+		self.gridLayout.addLayout(Sub(self,None,"\u0254"),row,4,1,1)
+		self.gridLayout.addLayout(Sub(self,None,"\u0254"),row,4,1,1)
+
+		row=row+1
+		self.gridLayout.addLayout(Sub(self,"\u025b\u0303","\u0153\u0303"),row,2,1,1)
+		self.gridLayout.addLayout(Sub(self,None,"\u0254\u0303"),row,4,1,1)
+
+		row=row+1
+		self.gridLayout.addLayout(Sub(self,"\u0061","\u0276"),row,3,1,1)
+		self.gridLayout.addLayout(Sub(self,"\u0251","\u0252"),row,4,1,1)
+
+		row=row+1
+		self.gridLayout.addLayout(Sub(self,"\u0251\u0303",None),row,4,1,1)
 
 if __name__ == "__main__":
 	import sys
