@@ -8,6 +8,8 @@ import argparse as ap
 import requests
 from local import get_tree
 
+import database
+
 _audio = False
 
 def getaudio(relpath):
@@ -102,12 +104,32 @@ if __name__ == "__main__":
 		if not os.path.exists(d):
 			os.makedirs(d)
 
+	database.create()
+	asess=database.Session()
+
 	for word in args.words:
 		tree=get_tree(word)
 		e=Entry(tree)
+		root=database.Root(root=word)
+		asess.add(root)
 		for zone in e.zones:
 			print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
+			usage=database.Usage(address=zone.get('address'),
+					lienson=zone.get('lienson'),
+					phonetic=zone.get('ipa'),
+					grammar=zone.get('part'), 
+					root=root)
+			asess.add(usage)
 			for indic in zone.get('indics'):
+				mean=database.Meaning(meaning=indic.get('indic'), usage=usage)
+				asess.add(mean)
 				print("\t",indic.get('indic'))
 				for expr in indic.get('expressions'):
+					exam=database.Example(meaning=mean, 
+						expression=expr.get('locution'),
+						translation=expr.get('traduction'),
+						lienson=expr.get('lienson')
+						)
+					asess.add(exam)
 					print("\t\t",expr.get('locution'))
+		asess.commit()
