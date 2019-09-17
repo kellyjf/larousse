@@ -21,7 +21,7 @@ class SButton(QtWidgets.QPushButton):
 
 class Sub(QtWidgets.QHBoxLayout):
 	def __init__(self, parent, lblunr, lblrnd):
-		super(QtWidgets.QHBoxLayout, self).__init__(parent)
+		super(QtWidgets.QHBoxLayout, self).__init__()
 
 		if lblunr:
 			unr=SButton(parent)
@@ -41,6 +41,12 @@ class Vowels(QtWidgets.QDialog, Ui_Vowels):
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
+
+		self.session=Session()
+		self.clearButton.clicked.connect(self.searchLine.clear)
+		self.searchButton.clicked.connect(self.search)
+
+
 		row=0
 		self.gridLayout.addLayout(Sub(self,'i','y'),row,0,1,1)
 		self.gridLayout.addLayout(Sub(self,None,"u"),row,4,1,1)
@@ -67,8 +73,22 @@ class Vowels(QtWidgets.QDialog, Ui_Vowels):
 		self.gridLayout.addLayout(Sub(self,"\u0251\u0303",None),row,4,1,1)
 
 	def click(self, lbl="Empty"):
+		self.searchLine.insert(lbl)
 		print("Click",lbl)
 
+	def search(self):
+		snip=self.searchLine.text()
+		res=self.session.query(Usage).filter(Usage.phonetic.like("%{}%".format(snip)))
+		for _ in range(self.resultTable.rowCount()):
+			self.resultTable.removeRow(0)
+		for cnt,ans in enumerate(res):
+			self.resultTable.insertRow(cnt)
+			self.resultTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.address))
+			self.resultTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(ans.phonetic))
+			self.resultTable.setItem(cnt,2,QtWidgets.QTableWidgetItem(ans.grammar))
+
+		print([x.root for x in res])
+			
 if __name__ == "__main__":
 	import sys
 	app = QtWidgets.QApplication(sys.argv)
