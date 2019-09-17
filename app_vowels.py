@@ -9,19 +9,30 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from ui_vowels import Ui_Vowels
+from database import *
+
+class SButton(QtWidgets.QPushButton):
+	notify = QtCore.pyqtSignal(str)
+	def __init__(self, parent):
+		super(QtWidgets.QPushButton, self).__init__(parent)
+		self.clicked.connect(self.sendit)
+	def sendit(self):
+		self.notify.emit(self.text())
 
 class Sub(QtWidgets.QHBoxLayout):
 	def __init__(self, parent, lblunr, lblrnd):
 		super(QtWidgets.QHBoxLayout, self).__init__(parent)
 
 		if lblunr:
-			unr=QtWidgets.QPushButton(parent)
+			unr=SButton(parent)
 			unr.setText(lblunr)
 			unr.setStyleSheet("background-color: rgb(180,180,200);")
+			unr.notify.connect(parent.click)
 			self.addWidget(unr)
 		if lblrnd:
-			rnd=QtWidgets.QPushButton(parent)
+			rnd=SButton(parent)
 			rnd.setStyleSheet("background-color: rgb(200,180,180);")
+			rnd.notify.connect(parent.click)
 			rnd.setText(lblrnd)
 			self.addWidget(rnd)
 	
@@ -54,6 +65,9 @@ class Vowels(QtWidgets.QDialog, Ui_Vowels):
 
 		row=row+1
 		self.gridLayout.addLayout(Sub(self,"\u0251\u0303",None),row,4,1,1)
+
+	def click(self, lbl="Empty"):
+		print("Click",lbl)
 
 if __name__ == "__main__":
 	import sys
