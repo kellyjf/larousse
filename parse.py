@@ -17,12 +17,12 @@ def getaudio(relpath):
 	name=relpath.split("/")[-1]
 	afile=args.audio_dir+"/"+name
 	if not os.path.exists(afile):
-		#print "GET",base+relpath
+		print("GET",base+relpath)
 		resp=requests.get(base+relpath)
-		#print "GET",resp.status_code
+		#print("GET",resp.status_code)
 		if resp.status_code==200:
 			with open(afile,"w") as f:
-				f.write(resp.content)
+				f.write(str(resp.content))
 
 class Entry:
 	def __init__(self, tree=None):
@@ -120,6 +120,8 @@ if __name__ == "__main__":
 					grammar=zone.get('part'), 
 					root=root)
 			asess.add(usage)
+			if args.audio and zone.get('lienson'):
+				getaudio(zone.get('lienson'))
 			for indic in zone.get('indics'):
 				mean=database.Meaning(meaning=indic.get('indic'), usage=usage)
 				asess.add(mean)
@@ -131,5 +133,7 @@ if __name__ == "__main__":
 						lienson=expr.get('lienson')
 						)
 					asess.add(exam)
+					if args.audio and expr.get('lienson'):
+						getaudio(expr.get('lienson'))
 					print("\t\t",expr.get('locution'))
 		asess.commit()
