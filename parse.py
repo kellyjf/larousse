@@ -17,6 +17,7 @@ def getaudio(relpath):
 	name=relpath.split("/")[-1]
 	afile=args.audio_dir+"/"+name
 	if not os.path.exists(afile):
+		print("GET",afile)
 		resp=requests.get(base+relpath)
 		#print("GET",resp.status_code)
 		if resp.status_code==200:
@@ -90,7 +91,59 @@ class Entry:
 					#print "EXAMPLE", l3,l2,t2
 					if _audio:
 						getaudio(l3)
+def download_audio(word):
+	ret=asess.query(database.Root).filter(database.Root.root==word).first()
+	if not ret:
+		return None
+
+	#print( ret,dir(ret))	
+	for usage in ret.usages:
+		if usage.lienson:
+			getaudio(usage.lienson)
+		for meaning in usage.meanings:
+			for example in meaning.examples:
+				if example.lienson:
+					getaudio(example.lienson)
 		
+def download_html(word, force=False):
+	ret=asess.query(database.Root.root).filter(database.Root.root==word).first()
+	if ret:
+		if force:
+			sess.delete(ret)
+		else:
+			return ret
+
+	tree=get_tree(word)
+	e=Entry(tree)
+	root=database.Root(root=word)
+	asess.add(root)
+	for zone in e.zones:
+		print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
+		usage=database.Usage(address=zone.get('address'),
+				lienson=zone.get('lienson'),
+				phonetic=zone.get('ipa'),
+				grammar=zone.get('part'), 
+				root=root)
+		asess.add(usage)
+		if args.audio and zone.get('lienson'):
+			getaudio(zone.get('lienson'))
+		for indic in zone.get('indics'):
+			mean=database.Meaning(meaning=indic.get('indic'), usage=usage)
+			asess.add(mean)
+			print("\t",indic.get('indic'))
+			for expr in indic.get('expressions'):
+				exam=database.Example(meaning=mean, 
+					expression=expr.get('locution'),
+					translation=expr.get('traduction'),
+					lienson=expr.get('lienson')
+					)
+				asess.add(exam)
+				if args.audio and expr.get('lienson'):
+					getaudio(expr.get('lienson'))
+				print("\t\t",expr.get('locution'))
+	asess.commit()
+	return root
+
 if __name__ == "__main__":
 	parser = ap.ArgumentParser()
 	parser.add_argument("words", nargs="*", default=['avoir'])
@@ -109,34 +162,7 @@ if __name__ == "__main__":
 	qsess=database.Session()
 
 	for word in args.words:
-		if asess.query(database.Root.root).filter(database.Root.root==word).first():
-			continue
-		tree=get_tree(word)
-		e=Entry(tree)
-		root=database.Root(root=word)
-		asess.add(root)
-		for zone in e.zones:
-			print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
-			usage=database.Usage(address=zone.get('address'),
-					lienson=zone.get('lienson'),
-					phonetic=zone.get('ipa'),
-					grammar=zone.get('part'), 
-					root=root)
-			asess.add(usage)
-			if args.audio and zone.get('lienson'):
-				getaudio(zone.get('lienson'))
-			for indic in zone.get('indics'):
-				mean=database.Meaning(meaning=indic.get('indic'), usage=usage)
-				asess.add(mean)
-				print("\t",indic.get('indic'))
-				for expr in indic.get('expressions'):
-					exam=database.Example(meaning=mean, 
-						expression=expr.get('locution'),
-						translation=expr.get('traduction'),
-						lienson=expr.get('lienson')
-						)
-					asess.add(exam)
-					if args.audio and expr.get('lienson'):
-						getaudio(expr.get('lienson'))
-					print("\t\t",expr.get('locution'))
-		asess.commit()
+		root=download_html(word)
+		if args.audio:
+			download_audio(word)
+

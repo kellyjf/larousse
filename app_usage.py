@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'word.ui'
@@ -10,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from ui_usage import Ui_Usage
 from database import *
-
+import os
 	
 class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	def __init__(self, parent=None, word=None):
@@ -18,9 +20,10 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		self.setupUi(self)
 
 		self.session=Session()
+		self.wordLine.editingFinished.connect(self.search)
 		self.searchButton.clicked.connect(self.search)
-		self.usageTable.cellDoubleClicked.connect(self.setusage)
-		self.meaningTable.cellDoubleClicked.connect(self.setmeaning)
+		self.usageTable.cellClicked.connect(self.setusage)
+		self.meaningTable.cellClicked.connect(self.setmeaning)
 		self.exampleTable.cellDoubleClicked.connect(self.setexample)
 		if word:
 			self.wordLine.setText(word)
@@ -67,11 +70,16 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	def setexample(self,row,col):
 		self.example=self.examples[row]
 		if self.example and self.example.lienson:
-			print(self.example.lienson)
+			path=self.example.lienson.split("/")
+			os.system("mpg123 audio/"+path[-1])
+
 	
 if __name__ == "__main__":
 	import sys
 	app = QtWidgets.QApplication(sys.argv)
-	win=UsageDialog(word='avoir')
+	if len(sys.argv)>1:
+		win=UsageDialog(word=sys.argv[1])
+	else:
+		win=UsageDialog(word='avoir')
 	win.show()
 	sys.exit(app.exec_())
