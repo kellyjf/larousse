@@ -51,3 +51,6 @@ class Example(Base):
 def create():
 	Base.metadata.create_all(engine)
 
+if __name__ == "__main__":
+	print("Hello")
+
