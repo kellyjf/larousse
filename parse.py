@@ -9,7 +9,7 @@ import requests
 from local import get_tree
 
 import database
-
+import re
 _audio = False
 
 def getaudio(relpath):
@@ -48,7 +48,13 @@ class Entry:
 			if lienson:
 				zdict['lienson']=lienson[0].attrib['href']
 			if gram:
-				zdict['part']=gram[0].text_content()
+				txt=gram[0].text_content()
+				txt=re.sub("Conjugaison","",txt)
+				txt=re.sub("\(","",txt)
+				txt=re.sub("\)","",txt)
+				txt=re.sub(" \s+"," ",txt)
+				txt=re.sub("\s+$","",txt)
+				zdict['part']=txt
 			if phones:
 				zdict['ipa']=phones[1].text_content()
 			if adr:
