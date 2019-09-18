@@ -15,7 +15,7 @@ class Root(Base):
 
 	id = Column(Integer, primary_key=True)
 	root = Column(String)
-	usages = relationship("Usage",back_populates='root')
+	usages = relationship("Usage",back_populates='root',cascade="all, delete-orphan")
 
 class Usage(Base):
 	__tablename__ = "usages"
@@ -27,7 +27,7 @@ class Usage(Base):
 	phonetic = Column(String)
 	root_id = Column(Integer, ForeignKey('roots.id'))
 	root = relationship("Root",back_populates='usages')
-	meanings = relationship("Meaning",back_populates='usage')
+	meanings = relationship("Meaning",back_populates='usage',cascade="all, delete-orphan")
 
 class Meaning(Base):
 	__tablename__ = "meanings"
@@ -36,7 +36,7 @@ class Meaning(Base):
 	meaning = Column(String)
 	usage_id = Column(Integer, ForeignKey('usages.id'))
 	usage = relationship("Usage",back_populates='meanings')
-	examples = relationship("Example",back_populates='meaning')
+	examples = relationship("Example",back_populates='meaning',cascade="all, delete-orphan")
 
 class Example(Base):
 	__tablename__ = "examples"

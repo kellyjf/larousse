@@ -20,6 +20,8 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		self.session=Session()
 		self.searchButton.clicked.connect(self.search)
 		self.usageTable.cellDoubleClicked.connect(self.setusage)
+		self.meaningTable.cellDoubleClicked.connect(self.setmeaning)
+		self.exampleTable.cellDoubleClicked.connect(self.setexample)
 		if word:
 			self.wordLine.setText(word)
 			self.search()
@@ -42,7 +44,6 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 
 		
 	def setusage(self,row,col):
-		print(row,col)
 		self.usage=self.root.usages[row]
 		self.meanings=self.usage.meanings
 
@@ -52,6 +53,21 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			self.meaningTable.insertRow(cnt)
 			self.meaningTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.meaning))
 		
+	def setmeaning(self,row,col):
+		self.meaning=self.meanings[row]
+		self.examples=self.meaning.examples
+
+		for _ in range(self.exampleTable.rowCount()):
+			self.exampleTable.removeRow(0)
+		for cnt,ans in enumerate(self.examples):
+			self.exampleTable.insertRow(cnt)
+			self.exampleTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.expression))
+			self.exampleTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(ans.translation))
+		
+	def setexample(self,row,col):
+		self.example=self.examples[row]
+		if self.example and self.example.lienson:
+			print(self.example.lienson)
 	
 if __name__ == "__main__":
 	import sys

@@ -17,12 +17,12 @@ def getaudio(relpath):
 	name=relpath.split("/")[-1]
 	afile=args.audio_dir+"/"+name
 	if not os.path.exists(afile):
-		print("GET",base+relpath)
 		resp=requests.get(base+relpath)
 		#print("GET",resp.status_code)
 		if resp.status_code==200:
-			with open(afile,"w") as f:
-				f.write(str(resp.content))
+			with open(afile,"wb") as f:
+				for chunk in resp:
+					f.write(chunk)
 
 class Entry:
 	def __init__(self, tree=None):
@@ -106,8 +106,11 @@ if __name__ == "__main__":
 
 	database.create()
 	asess=database.Session()
+	qsess=database.Session()
 
 	for word in args.words:
+		if asess.query(database.Root.root).filter(database.Root.root==word).first():
+			continue
 		tree=get_tree(word)
 		e=Entry(tree)
 		root=database.Root(root=word)
