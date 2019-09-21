@@ -3,11 +3,12 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker,relationship
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, func
 
 
 Base=declarative_base()
-engine=create_engine("sqlite:///junk.sqlite")
+engine=create_engine("sqlite:///french.sqlite")
+#engine=create_engine("sqlite:///junk.sqlite")
 Session=sessionmaker(bind=engine)
 
 class Root(Base):
@@ -47,6 +48,28 @@ class Example(Base):
 	lienson = Column(String)
 	meaning_id = Column(Integer, ForeignKey('meanings.id'))
 	meaning = relationship("Meaning",back_populates='examples')
+
+class Media(Base):
+	__tablename__ = "media"
+
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+	description = Column(String)
+	url = Column(String)
+	created = Column(DateTime)
+
+
+class Expression(Base):
+	__tablename__ = "expressions"
+
+	id = Column(Integer, primary_key=True)
+	category = Column(String)
+	expression = Column(String)
+	example = Column(String)
+	meaning = Column(String)
+	url = Column(String)
+	created = Column(DateTime)
+
 
 def create():
 	Base.metadata.create_all(engine)
