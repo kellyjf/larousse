@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui_usage import Ui_Usage
 from database import *
 import os
+import parse
 	
 class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	def __init__(self, parent=None, word=None):
@@ -22,6 +23,7 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		self.session=Session()
 		self.wordLine.editingFinished.connect(self.search)
 		self.searchButton.clicked.connect(self.search)
+		self.downloadButton.clicked.connect(self.download)
 		self.usageTable.cellClicked.connect(self.setusage)
 		self.meaningTable.cellClicked.connect(self.setmeaning)
 		self.exampleTable.cellDoubleClicked.connect(self.setexample)
@@ -72,6 +74,11 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		if self.example and self.example.lienson:
 			path=self.example.lienson.split("/")
 			os.system("mpg123 audio/"+path[-1])
+
+	
+	def download(self):
+		snip=self.wordLine.text()
+		parse.download(snip)
 
 	
 if __name__ == "__main__":

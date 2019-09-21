@@ -11,11 +11,12 @@ from local import get_tree
 import database
 import re
 _audio = False
+_audio_dir="audio"
 
 def getaudio(relpath):
 	base="https://www.larousse.fr/"
 	name=relpath.split("/")[-1]
-	afile=args.audio_dir+"/"+name
+	afile=_audio_dir+"/"+name
 	if not os.path.exists(afile):
 		print("GET",afile)
 		resp=requests.get(base+relpath)
@@ -60,10 +61,6 @@ class Entry:
 			if adr:
 				zdict['address']=adr[0].text_content()
 
-			if _audio:
-				getaudio(ls)
-
-
 			examples=[x.getparent() for x in ze.xpath("..//span[@class='Indicateur']")]
 			if not examples:
 				examples=ze.xpath("..//div[@class='ZoneTexte']")
@@ -94,11 +91,10 @@ class Entry:
 					xdict['lienson']=l3
 					edict['expressions'].append(xdict)
 
-					#print "EXAMPLE", l3,l2,t2
-					if _audio:
-						getaudio(l3)
 def download_audio(word):
-	ret=asess.query(database.Root).filter(database.Root.root==word).first()
+	lsess=database.Session()
+	ret=lsess.query(database.Root).filter(database.Root.root==word).first()
+
 	if not ret:
 		return None
 
@@ -110,19 +106,22 @@ def download_audio(word):
 			for example in meaning.examples:
 				if example.lienson:
 					getaudio(example.lienson)
-		
+
+	lsess.close()
+
 def download_html(word, force=False):
-	ret=asess.query(database.Root.root).filter(database.Root.root==word).first()
+	lsess=database.Session()
+	ret=lsess.query(database.Root.root).filter(database.Root.root==word).first()
 	if ret:
 		if force:
-			sess.delete(ret)
+			lsess.delete(ret)
 		else:
 			return ret
 
 	tree=get_tree(word)
 	e=Entry(tree)
 	root=database.Root(root=word)
-	asess.add(root)
+	lsess.add(root)
 	for zone in e.zones:
 		print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
 		usage=database.Usage(address=zone.get('address'),
@@ -130,12 +129,10 @@ def download_html(word, force=False):
 				phonetic=zone.get('ipa'),
 				grammar=zone.get('part'), 
 				root=root)
-		asess.add(usage)
-		if args.audio and zone.get('lienson'):
-			getaudio(zone.get('lienson'))
+		#lsess.add(usage)
 		for indic in zone.get('indics'):
 			mean=database.Meaning(meaning=indic.get('indic'), usage=usage)
-			asess.add(mean)
+			#lsess.add(mean)
 			print("\t",indic.get('indic'))
 			for expr in indic.get('expressions'):
 				exam=database.Example(meaning=mean, 
@@ -143,12 +140,15 @@ def download_html(word, force=False):
 					translation=expr.get('traduction'),
 					lienson=expr.get('lienson')
 					)
-				asess.add(exam)
-				if args.audio and expr.get('lienson'):
-					getaudio(expr.get('lienson'))
+				#lsess.add(exam)
 				print("\t\t",expr.get('locution'))
-	asess.commit()
+	lsess.commit()
+	lsess.close()
 	return root
+
+def download(word):
+	download_html(word)
+	download_audio(word)
 
 if __name__ == "__main__":
 	parser = ap.ArgumentParser()
@@ -157,6 +157,7 @@ if __name__ == "__main__":
 	parser.add_argument("--audio-dir", default="audio")
 	parser.add_argument("--audio", action="store_true")
 	parser.add_argument("--debug", action="store_true")
+	parser.add_argument("--force", default=False, action="store_true")
 	args=parser.parse_args()
 
 	for d in [ args.audio_dir, args.word_dir ]:
@@ -167,8 +168,11 @@ if __name__ == "__main__":
 	asess=database.Session()
 	qsess=database.Session()
 
+	if args.audio_dir:
+		_audio_dir=args.audio_dir
+
 	for word in args.words:
-		root=download_html(word)
+		root=download_html(word, force=args.force)
 		if args.audio:
 			download_audio(word)
 
