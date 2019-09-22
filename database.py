@@ -74,6 +74,14 @@ class Expression(Base):
 def create():
 	Base.metadata.create_all(engine)
 
+def grammars():
+	sess=Session()
+	res=sess.query(Usage.grammar,func.count(Usage.grammar).label("cnt")).group_by("grammar").order_by("cnt").all()
+	sess.close()
+	return res
+
 if __name__ == "__main__":
 	print("Hello")
+	res=grammars()
+
 
