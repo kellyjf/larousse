@@ -16,6 +16,7 @@ class Root(Base):
 
 	id = Column(Integer, primary_key=True)
 	root = Column(String)
+	created = Column(DateTime)
 	usages = relationship("Usage",back_populates='root',cascade="all, delete-orphan")
 
 class Usage(Base):

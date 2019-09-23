@@ -9,6 +9,7 @@ import requests
 from local import get_tree
 
 import database
+import datetime
 import re
 _audio = False
 _audio_dir="audio"
@@ -121,6 +122,9 @@ def download_html(word, force=False):
 	tree=get_tree(word)
 	e=Entry(tree)
 	root=database.Root(root=word)
+	if not root.created:
+		st=os.stat("words/{}".format(word))
+		root.created = datetime.datetime.fromtimestamp(st.st_mtime)
 	lsess.add(root)
 	for zone in e.zones:
 		print("{0} {1} {2}".format(zone.get('address'), zone.get('ipa'),zone.get('part')))
