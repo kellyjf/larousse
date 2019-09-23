@@ -111,6 +111,9 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	
 if __name__ == "__main__":
 	import sys
+	import signal
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 	app = QtWidgets.QApplication(sys.argv)
 	if len(sys.argv)>1:
 		win=UsageDialog(word=sys.argv[1])
