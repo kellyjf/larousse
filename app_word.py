@@ -11,29 +11,45 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui_word import Ui_Word
 import time
 from app_work import Web
+from app_usage import UsageDialog
+from database import Session, Root
+import parse
 
 class Word(QtWidgets.QDialog, Ui_Word):
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
-		self.thread=QtCore.QThread()
-		self.web=Web()
-		self.web.moveToThread(self.thread)
-		self.web.loaded.connect(self.loaded)
-		self.thread.start()
-		self.loadButton.clicked.connect(self.load)
 
-	def load(self):
-		name=self.findCombo.currentText()
-		self.web.load(name)
+		self.session = Session()
+		self.usage = UsageDialog()
+		#self.wordLine.editingFinished.connect(self.search)		
+		self.searchButton.clicked.connect(self.search)		
+		self.downloadButton.clicked.connect(self.download)		
+		self.wordTable.cellDoubleClicked.connect(self.open_usage)		
 
-	def loaded(self):
-		print("Loaded")
-		for zone in self.web.entry.zones:
-			self.mainTable.insertRow(0)
-			self.mainTable.setItem(0,0,QtWidgets.QTableWidgetItem(zone.get('address')))
-			self.mainTable.setItem(0,1,QtWidgets.QTableWidgetItem(zone.get('ipa')))	
+	def open_usage(self,row,col):
+		tgt=self.wordTable.item(row,0).text()
+		self.usage.settext(tgt)
+		self.usage.show()
 
+	def search(self):
+		snip=self.wordLine.text()
+		self.words=self.session.query(Root).filter(Root.root.like("%{}%".format(snip))).order_by(Root.root).all()
+		
+		for _ in range(self.wordTable.rowCount()):
+			self.wordTable.removeRow(0)
+
+		for cnt,root in enumerate(self.words):
+			self.wordTable.insertRow(cnt)
+			self.wordTable.setItem(cnt,0, QtWidgets.QTableWidgetItem(root.root))
+			self.wordTable.setItem(cnt,1, QtWidgets.QTableWidgetItem(root.importance))
+			self.wordTable.setItem(cnt,2, QtWidgets.QTableWidgetItem(root.skill))
+			encdate=root.created.strftime("%Y-%m-%d")
+			self.wordTable.setItem(cnt,4,QtWidgets.QTableWidgetItem(encdate))
+
+	def download(self):
+		snip=self.wordLine.text()
+		parse.download(snip)
 
 
 

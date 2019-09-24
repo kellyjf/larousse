@@ -34,8 +34,9 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			self.wordLine.setText(word)
 			self.search()
 
-	def settext(self, ndx):
+	def settext(self, word):
 		self.grammarCombo.setCurrentIndex(0)
+		self.wordLine.setText(word)
 		self.search()
 
 	def setgrammar(self, ndx):
@@ -54,15 +55,17 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		snip=self.wordLine.text()
 		gram=self.grammarCombo.currentText()
 
+		for _ in range(self.usageTable.rowCount()):
+			self.usageTable.removeRow(0)
+
 		self.usage=[]
 		if snip:
 			self.root=self.session.query(Root).filter(Root.root==snip).first()
+			if not self.root:
+				return
 			self.usages=self.root.usages
 		elif gram:
 			self.usages=self.session.query(Usage).filter(Usage.grammar==gram).all()
-
-		for _ in range(self.usageTable.rowCount()):
-			self.usageTable.removeRow(0)
 
 		for cnt,ans in enumerate(self.usages):
 			self.usageTable.insertRow(cnt)

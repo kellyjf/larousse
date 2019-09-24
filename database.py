@@ -16,8 +16,20 @@ class Root(Base):
 
 	id = Column(Integer, primary_key=True)
 	root = Column(String)
+	importance = Column(Integer)
+	skill = Column(Integer)
 	created = Column(DateTime)
 	usages = relationship("Usage",back_populates='root',cascade="all, delete-orphan")
+	encounters = relationship("Encounter",back_populates='root',cascade="all, delete-orphan")
+
+class Encounter(Base):
+	__tablename__ = "encounters"
+
+	id = Column(Integer, primary_key=True)
+	root_id = Column(Integer, ForeignKey('roots.id'))
+	root = relationship("Root",back_populates='encounters')
+	enconter_time = Column(DateTime)
+	notes = Column(String)
 
 class Usage(Base):
 	__tablename__ = "usages"

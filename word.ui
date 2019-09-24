@@ -6,42 +6,88 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>389</height>
+    <width>673</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Word Definitiions</string>
+   <string>Words</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QComboBox" name="findCombo">
-       <property name="editable">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Word</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="wordLine"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="grammarCombo"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="searchButton">
+       <property name="text">
+        <string>Search</string>
+       </property>
+       <property name="default">
         <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="loadButton">
+      <widget class="QPushButton" name="downloadButton">
        <property name="text">
-        <string>&amp;Load</string>
+        <string>Download</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QTableWidget" name="mainTable">
+    <widget class="QTableWidget" name="wordTable">
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
      <column>
       <property name="text">
-       <string>Name</string>
+       <string>Word</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Definition</string>
+       <string>Importance</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Skill</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Visits</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Latest</string>
       </property>
      </column>
     </widget>

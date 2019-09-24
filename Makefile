@@ -13,9 +13,12 @@ ui: $(UI)
 ui_%.py : %.ui
 	pyuic5 -i 0 $< > $@
 
+database:
+	./parse.py --audio $(subst words/,,$(wildcard words/*))
+
 test: $(UI)
-	python3 app_expression.py
+	python3 app_word.py
+	#python3 app_expression.py
 	#python3 app_usage.py
 	#python3 app_vowels.py
-	#python3 app_word.py
 
