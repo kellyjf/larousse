@@ -17,7 +17,6 @@ class Root(Base):
 	id = Column(Integer, primary_key=True)
 	root = Column(String)
 	importance = Column(Integer)
-	skill = Column(Integer)
 	created = Column(DateTime)
 	usages = relationship("Usage",back_populates='root',cascade="all, delete-orphan")
 	encounters = relationship("Encounter",back_populates='root',cascade="all, delete-orphan")
@@ -28,8 +27,21 @@ class Encounter(Base):
 	id = Column(Integer, primary_key=True)
 	root_id = Column(Integer, ForeignKey('roots.id'))
 	root = relationship("Root",back_populates='encounters')
+	media_id = Column(Integer, ForeignKey('media.id'))
+	media = relationship("Media",back_populates='encounters')
+	skill = Column(Integer)
 	enconter_time = Column(DateTime)
 	notes = Column(String)
+
+class Media(Base):
+	__tablename__ = "media"
+
+	id = Column(Integer, primary_key=True)
+	encounters = relationship("Encounter",back_populates='media',cascade="all, delete-orphan")
+	name = Column(String)
+	description = Column(String)
+	url = Column(String)
+	created = Column(DateTime)
 
 class Usage(Base):
 	__tablename__ = "usages"
@@ -61,16 +73,6 @@ class Example(Base):
 	lienson = Column(String)
 	meaning_id = Column(Integer, ForeignKey('meanings.id'))
 	meaning = relationship("Meaning",back_populates='examples')
-
-class Media(Base):
-	__tablename__ = "media"
-
-	id = Column(Integer, primary_key=True)
-	name = Column(String)
-	description = Column(String)
-	url = Column(String)
-	created = Column(DateTime)
-
 
 class Expression(Base):
 	__tablename__ = "expressions"
