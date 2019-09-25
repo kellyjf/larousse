@@ -39,7 +39,7 @@ class Media(Base):
 	id = Column(Integer, primary_key=True)
 	encounters = relationship("Encounter",back_populates='media',cascade="all, delete-orphan")
 	name = Column(String)
-	description = Column(String)
+	notes = Column(String)
 	url = Column(String)
 	created = Column(DateTime)
 

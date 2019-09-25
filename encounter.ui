@@ -64,7 +64,7 @@
       <widget class="QTextEdit" name="notesText"/>
      </item>
      <item row="2" column="1">
-      <widget class="QSpinBox" name="spinBox">
+      <widget class="QSpinBox" name="skillSpin">
        <property name="maximum">
         <number>100</number>
        </property>

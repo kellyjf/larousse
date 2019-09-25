@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'word.ui'
@@ -43,7 +44,8 @@ class Word(QtWidgets.QDialog, Ui_Word):
 			self.wordTable.insertRow(cnt)
 			self.wordTable.setItem(cnt,0, QtWidgets.QTableWidgetItem(root.root))
 			self.wordTable.setItem(cnt,1, QtWidgets.QTableWidgetItem(root.importance))
-			self.wordTable.setItem(cnt,2, QtWidgets.QTableWidgetItem(root.skill))
+			# Calculate skill and date from encounters
+			print("LEN",len(root.encounters))
 			encdate=root.created.strftime("%Y-%m-%d")
 			self.wordTable.setItem(cnt,4,QtWidgets.QTableWidgetItem(encdate))
 
