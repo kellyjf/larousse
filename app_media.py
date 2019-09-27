@@ -25,6 +25,12 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.editButton.clicked.connect(self.editmedia)
 		self.newButton.clicked.connect(self.newmedia)
 		self.deleteButton.clicked.connect(self.delmedia)
+		self.mediaTable.currentCellChanged.connect(self.changed)
+
+	def changed(self):
+		row=self.mediaTable.currentRow()
+		if row>-1:
+			self.notesText.setText(self.medialist[row].notes)
 
 	def delmedia(self):
 		row=self.mediaTable.currentRow()
