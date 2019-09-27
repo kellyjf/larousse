@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui_media import Ui_Media
 from app_mediaedit import MediaEditDialog
 from database import Media, Session, Encounter
+from datetime import datetime
 
 class MediaDialog(QtWidgets.QDialog, Ui_Media):
 	def __init__(self, parent=None):
@@ -22,9 +23,25 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.editDialog.accepted.connect(self.accepted)
 		self.searchButton.clicked.connect(self.search)
 		self.editButton.clicked.connect(self.editmedia)
+		self.newButton.clicked.connect(self.newmedia)
+		self.deleteButton.clicked.connect(self.delmedia)
+
+	def delmedia(self):
+		row=self.mediaTable.currentRow()
+		self.subject=self.medialist[row]
+		self.session.delete(self.subject)
+		self.session.commit()
+		self.search()
 
 	def accepted(self):
+		self.session.add(self.subject)
 		self.session.commit()
+		self.search()
+
+	def newmedia(self):
+		self.subject=Media(created=datetime.now())
+		self.editDialog.setmedia(self.subject)
+		self.editDialog.show()
 
 	def editmedia(self):
 		row=self.mediaTable.currentRow()
