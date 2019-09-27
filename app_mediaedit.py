@@ -17,7 +17,6 @@ class MediaEditDialog(QtWidgets.QDialog, Ui_MediaEdit):
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
-		self.session=Session()
 
 	def setmedia(self,media):
 		self.media=media
@@ -32,9 +31,6 @@ class MediaEditDialog(QtWidgets.QDialog, Ui_MediaEdit):
 		cdate=self.createdDate.date()
 		self.media.created=date(cdate.year(),cdate.month(),cdate.day())
 		self.media.notes=self.notesText.toPlainText()
-
-		self.session.add(self.media)
-		self.session.commit()
 
 		print("accept")
 		super(MediaEditDialog,self).accept()

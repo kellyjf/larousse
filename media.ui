@@ -47,7 +47,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QTableWidget" name="wordTable">
+      <widget class="QTableWidget" name="mediaTable">
        <property name="sizeAdjustPolicy">
         <enum>QAbstractScrollArea::AdjustToContents</enum>
        </property>
@@ -101,21 +101,21 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QPushButton" name="newButton_2">
+        <widget class="QPushButton" name="newButton">
          <property name="text">
           <string>New</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="editButton_2">
+        <widget class="QPushButton" name="editButton">
          <property name="text">
           <string>Edit</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="deleteButton_2">
+        <widget class="QPushButton" name="deleteButton">
          <property name="text">
           <string>Delete</string>
          </property>
