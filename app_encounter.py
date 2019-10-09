@@ -20,20 +20,26 @@ class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
 		self.setupUi(self)
 		self.session=Session()
 		self.encounterDate.setDate(datetime.now())
-		self.setword("")
 
-
-	def setword(self,skey):
-
-		self.wordCombo.clear()
-		matches=self.session.query(Root).all()
+	def setwords(self,matches):
+		for _ in range(self.wordCombo.count()):
+			self.wordCombo.removeRow(0)
 		for row,match in enumerate(matches):
 			self.wordCombo.insertItem(row,match.root,match)
 
-		self.mediaCombo.clear()
-		media=self.session.query(Media).all()
+	def setmedia(self,media):
+		for _ in range(self.mediaCombo.count()):
+			self.mediaCombo.removeRow(0)
 		for row,medium in enumerate(media):
 			self.mediaCombo.insertItem(row,medium.name,medium)
+
+	def setdata(self,encounter):
+		if encounter.root:
+			self.wordCombo.setEditText(encounter.root.root)
+		if encounter.media:
+			self.mediaCombo.setEditText(encounter.media.name)
+		self.skillSpin.setValue(encounter.skill)
+		self.enc=encounter
 
 	def accept(self):
 		root=self.wordCombo.itemData(self.wordCombo.currentIndex())
@@ -42,9 +48,11 @@ class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
 		cdate=self.encounterDate.date()
 		edate=date(cdate.year(),cdate.month(),cdate.day())
 
-		enc=Encounter(root=root,media=media,skill=skill,encounter_time=edate,notes=self.notesText.toPlainText())
-		self.session.add(enc)
-		self.session.commit()
+		self.enc.root=root
+		self.enc.media=media
+		self.enc.skill=skill
+		self.enc.encounter_time=edate
+		self.enc.notes=self.notesText.toPlainText()
 
 		super(type(self),self).accept()
 
