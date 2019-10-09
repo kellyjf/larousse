@@ -30,7 +30,7 @@ class Encounter(Base):
 	media_id = Column(Integer, ForeignKey('media.id'))
 	media = relationship("Media",back_populates='encounters')
 	skill = Column(Integer)
-	enconter_time = Column(DateTime)
+	encounter_time = Column(DateTime)
 	notes = Column(String)
 
 class Media(Base):
