@@ -36,8 +36,14 @@ class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
 	def setdata(self,encounter):
 		if encounter.root:
 			self.wordCombo.setEditText(encounter.root.root)
+			row=self.wordCombo.findText(encounter.root.root)
+			if row>-1:
+				self.wordCombo.setCurrentIndex(row)
 		if encounter.media:
 			self.mediaCombo.setEditText(encounter.media.name)
+			row=self.mediaCombo.findText(encounter.media.name)
+			if row>-1:
+				self.mediaCombo.setCurrentIndex(row)
 		self.skillSpin.setValue(encounter.skill)
 		self.enc=encounter
 

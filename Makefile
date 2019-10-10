@@ -17,8 +17,10 @@ ui_%.py : %.ui
 database:
 	./parse.py $(AUDIO) $(subst words/,,$(wildcard words/*))
 	for table in media encounters; do \
-		sqlite3 french.sqlite "drop table $${table}";\
-		sqlite3 french.sqlite < backups/$${table};\
+		if [ -e backups/$${table} ] ; then \
+			sqlite3 french.sqlite "drop table $${table}";\
+			sqlite3 french.sqlite < backups/$${table};\
+		fi; \
 	done
 
 backup:

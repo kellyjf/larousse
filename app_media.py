@@ -22,26 +22,45 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.session=Session()
 		self.roots=self.session.query(Root).order_by(Root.root).all()
 		self.media=self.session.query(Media).order_by(Media.name).all()
-		self.editDialog=MediaEditDialog(self)
+
 		self.encDialog=EncounterDialog(self)
 		self.encDialog.setwords(self.roots)
 		self.encDialog.setmedia(self.media)
-		self.editDialog.accepted.connect(self.acceptmed)
 		self.encDialog.accepted.connect(self.acceptenc)
+		self.newEncButton.clicked.connect(self.newenc)
+		self.editEncButton.clicked.connect(self.editenc)
+		self.deleteEncButton.clicked.connect(self.delenc)
+
+		self.editDialog=MediaEditDialog(self)
+		self.editDialog.accepted.connect(self.acceptmed)
 		self.searchButton.clicked.connect(self.search)
 		self.editButton.clicked.connect(self.editmedia)
 		self.newButton.clicked.connect(self.newmedia)
 		self.deleteButton.clicked.connect(self.delmedia)
 		self.mediaTable.currentCellChanged.connect(self.changed)
 
-		self.newEncButton.clicked.connect(self.newenc)
 
+		self.search()
+
+	def delenc(self):
+		row=self.encountersTable.currentRow()
+		cell=self.encountersTable.item(row,0)
+		self.encounter=cell.data(QtCore.Qt.UserRole)
+		self.session.delete(self.encounter)
+		self.session.commit()
 		self.search()
 
 	def newenc(self):
 		row=self.mediaTable.currentRow()
 		media=self.medialist[row]
 		self.encounter=Encounter(media=media,skill=60,notes="Put Notes Here")
+		self.encDialog.setdata(self.encounter)
+		self.encDialog.show()
+
+	def editenc(self):
+		row=self.encountersTable.currentRow()
+		cell=self.encountersTable.item(row,0)
+		self.encounter=cell.data(QtCore.Qt.UserRole)
 		self.encDialog.setdata(self.encounter)
 		self.encDialog.show()
 
@@ -59,8 +78,9 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 				self.encountersTable.removeRow(0)
 			for ndx,encounter in enumerate(media.encounters):
 				self.encountersTable.insertRow(ndx)
-				self.encountersTable.setItem(ndx,0,
-					QtWidgets.QTableWidgetItem(encounter.root.root))
+				cell=QtWidgets.QTableWidgetItem(encounter.root.root)
+				cell.setData(QtCore.Qt.UserRole,encounter)
+				self.encountersTable.setItem(ndx,0,cell)
 				self.encountersTable.setItem(ndx,1,
 					QtWidgets.QTableWidgetItem(encounter.encounter_time.strftime('%y-%m-%d')))
 				self.encountersTable.setItem(ndx,2,
