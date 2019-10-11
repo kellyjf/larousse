@@ -52,7 +52,8 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 
 	def newenc(self):
 		row=self.mediaTable.currentRow()
-		media=self.medialist[row]
+		cell=self.mediaTable.item(row,0)
+		media=cell.data(QtCore.Qt.UserRole)
 		self.encounter=Encounter(media=media,skill=60,notes="Put Notes Here")
 		self.encDialog.setdata(self.encounter)
 		self.encDialog.show()
@@ -72,7 +73,8 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 	def changed(self):
 		row=self.mediaTable.currentRow()
 		if row>-1:
-			media=self.medialist[row]
+			cell=self.mediaTable.item(row,0)
+			media=cell.data(QtCore.Qt.UserRole)
 			self.notesText.setText(media.notes)
 			for _ in range(self.encountersTable.rowCount()):
 				self.encountersTable.removeRow(0)
@@ -88,7 +90,8 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 
 	def delmedia(self):
 		row=self.mediaTable.currentRow()
-		self.subject=self.medialist[row]
+		cell=self.mediaTable.item(row,0)
+		self.subject=cell.data(QtCore.Qt.UserRole)
 		self.session.delete(self.subject)
 		self.session.commit()
 		self.search()
@@ -105,9 +108,9 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 
 	def editmedia(self):
 		row=self.mediaTable.currentRow()
-		self.subject=self.medialist[row]
-
 		if row>-1:
+			cell=self.mediaTable.item(row,0)
+			self.subject=cell.data(QtCore.Qt.UserRole)
 			self.editDialog.setmedia(self.subject)
 			self.editDialog.show()
 
@@ -120,7 +123,10 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 
 		for cnt,media in enumerate(self.medialist):
 			self.mediaTable.insertRow(cnt)
-			self.mediaTable.setItem(cnt,0, QtWidgets.QTableWidgetItem(media.name))
+			cell=QtWidgets.QTableWidgetItem(media.name)
+			cell.setData(QtCore.Qt.UserRole,media)
+			self.mediaTable.setItem(cnt,0, cell)
+
 			# Calculate skill and date from encounters
 			encdate=media.created.strftime("%Y-%m-%d")
 			self.mediaTable.setItem(cnt,4,QtWidgets.QTableWidgetItem(encdate))

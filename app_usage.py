@@ -67,43 +67,48 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		elif gram:
 			self.usages=self.session.query(Usage).filter(Usage.grammar==gram).all()
 
-		for cnt,ans in enumerate(self.usages):
+		for cnt,usage in enumerate(self.usages):
 			self.usageTable.insertRow(cnt)
-			self.usageTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.address))
-			self.usageTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(ans.phonetic))
-			self.usageTable.setItem(cnt,2,QtWidgets.QTableWidgetItem(ans.grammar))
+			cell=QtWidgets.QTableWidgetItem(usage.address)
+			cell.setData(QtCore.Qt.UserRole,usage)
+			self.usageTable.setItem(cnt,0,cell)
+			self.usageTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(usage.phonetic))
+			self.usageTable.setItem(cnt,2,QtWidgets.QTableWidgetItem(usage.grammar))
 
 		self.usageTable.setCurrentCell(0,0)
 		self.setusage(0,0)
 	
 	def setusage(self,row,col):
-		self.usage=self.usages[row]
-		self.meanings=self.usage.meanings
+		cell=self.usageTable.item(row,0)
+		usage=cell.data(QtCore.Qt.UserRole)	
 
 		for _ in range(self.meaningTable.rowCount()):
 			self.meaningTable.removeRow(0)
-		for cnt,ans in enumerate(self.meanings):
+		for cnt,meaning in enumerate(usage.meanings):
 			self.meaningTable.insertRow(cnt)
-
-		self.meaningTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.meaning))
+			cell=QtWidgets.QTableWidgetItem(meaning.meaning)
+			cell.setData(QtCore.Qt.UserRole,meaning)
+			self.meaningTable.setItem(cnt,0,cell)
 		self.meaningTable.setCurrentCell(0,0)
 		self.setmeaning(0,0)	
 		
 	def setmeaning(self,row,col):
-		self.meaning=self.meanings[row]
-		self.examples=self.meaning.examples
-
+		cell=self.meaningTable.item(row,0)
+		meaning=cell.data(QtCore.Qt.UserRole)	
 		for _ in range(self.exampleTable.rowCount()):
 			self.exampleTable.removeRow(0)
-		for cnt,ans in enumerate(self.examples):
+		for cnt,example in enumerate(meaning.examples):
 			self.exampleTable.insertRow(cnt)
-			self.exampleTable.setItem(cnt,0,QtWidgets.QTableWidgetItem(ans.expression))
-			self.exampleTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(ans.translation))
+			cell=QtWidgets.QTableWidgetItem(example.expression)
+			cell.setData(QtCore.Qt.UserRole,example)
+			self.exampleTable.setItem(cnt,0,cell)
+			self.exampleTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(example.translation))
 		
 	def setexample(self,row,col):
-		self.example=self.examples[row]
-		if self.example and self.example.lienson:
-			path=self.example.lienson.split("/")
+		cell=self.exampleTable.item(row,0)
+		example=cell.data(QtCore.Qt.UserRole)	
+		if example and example.lienson:
+			path=example.lienson.split("/")
 			os.system("mpg123 audio/"+path[-1])
 
 	
