@@ -14,12 +14,15 @@ from datetime import datetime,date
 from database import Encounter, Root, Media, Session
 
 class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
+	saveandnew = QtCore.pyqtSignal()
+
 	def __init__(self, parent=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 
 		self.setupUi(self)
 		self.session=Session()
 		self.encounterDate.setDate(datetime.now())
+		self.buttonBox.clicked.connect(self.clickapply)
 
 	def setwords(self,matches):
 		for _ in range(self.wordCombo.count()):
@@ -47,7 +50,7 @@ class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
 		self.skillSpin.setValue(encounter.skill)
 		self.enc=encounter
 
-	def accept(self):
+	def apply(self):
 		root=self.wordCombo.itemData(self.wordCombo.currentIndex())
 		media=self.mediaCombo.itemData(self.mediaCombo.currentIndex())
 		skill=self.skillSpin.value()
@@ -60,6 +63,14 @@ class EncounterDialog(QtWidgets.QDialog, Ui_Encounter):
 		self.enc.encounter_time=edate
 		self.enc.notes=self.notesText.toPlainText()
 
+	def clickapply(self,button):
+		if button.text() != "Apply":
+			return
+		self.apply()
+		self.saveandnew.emit()
+
+	def accept(self):
+		self.apply()
 		super(type(self),self).accept()
 
 if __name__ == "__main__":

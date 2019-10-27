@@ -39,8 +39,14 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.deleteButton.clicked.connect(self.delmedia)
 		self.mediaTable.currentCellChanged.connect(self.changed)
 
+		self.encDialog.saveandnew.connect(self.encapply)
 
 		self.search()
+
+	def encapply(self):
+		self.session.add(self.encounter)
+		self.session.commit()
+		self.newenc()
 
 	def delenc(self):
 		row=self.encountersTable.currentRow()
