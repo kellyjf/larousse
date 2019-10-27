@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from ui_media import Ui_Media
 from app_mediaedit import MediaEditDialog
 from app_encounter import EncounterDialog
+from app_usage import UsageDialog
 from database import Media, Session, Encounter, Root
 from datetime import datetime
 
@@ -20,6 +21,7 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
 		self.session=Session()
+		self.usage=UsageDialog(session=self.session)
 		self.roots=self.session.query(Root).order_by(Root.root).all()
 		self.media=self.session.query(Media).order_by(Media.name).all()
 
@@ -40,9 +42,16 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.mediaTable.currentCellChanged.connect(self.changed)
 
 		self.encDialog.saveandnew.connect(self.encapply)
+		self.encountersTable.cellDoubleClicked.connect(self.openword)
 
 		self.search()
 
+	def openword(self, row, col):
+		cell=self.encountersTable.item(row,0)
+		encounter=cell.data(QtCore.Qt.UserRole)
+		self.usage.settext(encounter.root.root)
+		self.usage.show()
+		print("Openword",encounter.root.root)	
 	def encapply(self):
 		self.session.add(self.encounter)
 		self.session.commit()

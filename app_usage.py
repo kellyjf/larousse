@@ -16,11 +16,15 @@ import os
 import parse
 	
 class UsageDialog(QtWidgets.QDialog, Ui_Usage):
-	def __init__(self, parent=None, word=None):
+	def __init__(self, parent=None, word=None, session=None):
 		super(QtWidgets.QDialog,self).__init__(parent)
 		self.setupUi(self)
 
-		self.session=Session()
+		if session:
+			self.session=session
+		else:
+			self.session=Session()
+
 		self.wordLine.editingFinished.connect(self.search)
 		self.searchButton.clicked.connect(self.search)
 		self.downloadButton.clicked.connect(self.download)
