@@ -31,6 +31,9 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		self.usageTable.cellClicked.connect(self.setusage)
 		self.meaningTable.cellClicked.connect(self.setmeaning)
 		self.exampleTable.cellDoubleClicked.connect(self.setexample)
+		self.exampleTree.itemDoubleClicked.connect(self.tsetexample)
+		self.exampleTree.setColumnWidth(0,300)
+		self.exampleTree.setColumnWidth(1,300)
 		self.populate_combo()
 		self.grammarCombo.currentIndexChanged[str].connect(self.setgrammar)
 
@@ -55,6 +58,20 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			self.grammarCombo.insertItem(cnt+1,grammar)
 
 
+	def tsearch(self, usages):
+		self.exampleTree.clear()
+		self.exampleTree.invisibleRootItem().setExpanded(True)
+		for cnt,usage in enumerate(self.usages):
+			uitem=QtWidgets.QTreeWidgetItem([usage.address,usage.phonetic])
+			self.exampleTree.insertTopLevelItem(cnt,uitem)
+			uitem.setExpanded(True)
+			for mcnt,meaning in enumerate(usage.meanings):
+				mitem=QtWidgets.QTreeWidgetItem(uitem,[meaning.meaning])
+				mitem.setExpanded(True)
+				for ecnt,example in enumerate(meaning.examples):
+					eitem=QtWidgets.QTreeWidgetItem(mitem,[example.expression,example.translation])
+					eitem.setData(0,QtCore.Qt.UserRole,example)
+	
 	def search(self):
 		snip=self.wordLine.text()
 		gram=self.grammarCombo.currentText()
@@ -70,6 +87,8 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			self.usages=self.root.usages
 		elif gram:
 			self.usages=self.session.query(Usage).filter(Usage.grammar==gram).all()
+
+		self.tsearch(self.usages)
 
 		for cnt,usage in enumerate(self.usages):
 			self.usageTable.insertRow(cnt)
@@ -115,6 +134,11 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			path=example.lienson.split("/")
 			os.system("mpg123 audio/"+path[-1])
 
+	def tsetexample(self,item,col):
+		example=item.data(0,QtCore.Qt.UserRole)	
+		if example and example.lienson:
+			path=example.lienson.split("/")
+			os.system("mpg123 audio/"+path[-1])
 	
 	def download(self):
 		snip=self.wordLine.text()
