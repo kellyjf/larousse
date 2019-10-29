@@ -34,12 +34,29 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 		self.exampleTree.itemDoubleClicked.connect(self.tsetexample)
 		self.exampleTree.setColumnWidth(0,300)
 		self.exampleTree.setColumnWidth(1,300)
+		self.playButton.clicked.connect(self.rsetexample)
 		self.populate_combo()
 		self.grammarCombo.currentIndexChanged[str].connect(self.setgrammar)
+		self.showExButton.clicked.connect(self.showtext)
+		self.showTrButton.clicked.connect(self.showtext)
+		self.nextButton.clicked.connect(self.movereview)
 
 		if word:
 			self.wordLine.setText(word)
 			self.search()
+
+	def showtext(self, widget=None):
+		if not self.review:
+			return
+		if self.showExButton.isChecked():
+			self.exampleText.setText(self.review[self.rcnt].expression)
+		else:
+			self.exampleText.setText("")
+
+		if self.showTrButton.isChecked():
+			self.transText.setText(self.review[self.rcnt].translation)
+		else:
+			self.transText.setText("")
 
 	def settext(self, word):
 		self.grammarCombo.setCurrentIndex(0)
@@ -61,6 +78,7 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	def tsearch(self, usages):
 		self.exampleTree.clear()
 		self.exampleTree.invisibleRootItem().setExpanded(True)
+		self.review=[]
 		for cnt,usage in enumerate(self.usages):
 			uitem=QtWidgets.QTreeWidgetItem([usage.address,usage.phonetic])
 			self.exampleTree.insertTopLevelItem(cnt,uitem)
@@ -71,7 +89,19 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 				for ecnt,example in enumerate(meaning.examples):
 					eitem=QtWidgets.QTreeWidgetItem(mitem,[example.expression,example.translation])
 					eitem.setData(0,QtCore.Qt.UserRole,example)
-	
+					self.review.append(example)
+
+		self.rcnt=-1
+		self.movereview()
+
+	def movereview(self):
+		self.numLabel.setText("{:d} of {:d}".format(self.rcnt+1,len(self.review)))
+		if self.review:
+			self.rcnt=(self.rcnt+1)%(len(self.review))
+		self.showExButton.setChecked(False)
+		self.showTrButton.setChecked(False)
+		self.showtext()
+
 	def search(self):
 		snip=self.wordLine.text()
 		gram=self.grammarCombo.currentText()
@@ -127,19 +157,21 @@ class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 			self.exampleTable.setItem(cnt,0,cell)
 			self.exampleTable.setItem(cnt,1,QtWidgets.QTableWidgetItem(example.translation))
 		
-	def setexample(self,row,col):
-		cell=self.exampleTable.item(row,0)
-		example=cell.data(QtCore.Qt.UserRole)	
-		if example and example.lienson:
-			path=example.lienson.split("/")
-			os.system("mpg123 audio/"+path[-1])
-
-	def tsetexample(self,item,col):
-		example=item.data(0,QtCore.Qt.UserRole)	
+	def playexample(self,example):
 		if example and example.lienson:
 			path=example.lienson.split("/")
 			os.system("mpg123 audio/"+path[-1])
 	
+	def setexample(self,row,col):
+		cell=self.exampleTable.item(row,0)
+		self.playexample(cell.data(QtCore.Qt.UserRole))
+
+	def tsetexample(self,item,col):
+		self.playexample(item.data(0,QtCore.Qt.UserRole))
+
+	def rsetexample(self):
+		self.playexample(self.review[self.rcnt])
+
 	def download(self):
 		snip=self.wordLine.text()
 		parse.download(snip)

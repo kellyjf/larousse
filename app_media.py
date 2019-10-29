@@ -40,7 +40,7 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.newButton.clicked.connect(self.newmedia)
 		self.deleteButton.clicked.connect(self.delmedia)
 		self.mediaTable.currentCellChanged.connect(self.changed)
-
+		self.mediaTable.setColumnWidth(0,200)
 		self.encDialog.saveandnew.connect(self.encapply)
 		self.encountersTable.cellDoubleClicked.connect(self.openword)
 
