@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+
+from database import Session, Media, Root, Encounter
+from parse import download
+from argparse import ArgumentParser as ap
+from datetime import datetime
+
+def list():
+	res=s.query(Media).all()
+	for media in res:
+		print (media.id,media.name)
+
+if __name__ == "__main__":
+	parser=ap()
+	parser.add_argument("--add", action="store_true",  help="Add new media")		
+	parser.add_argument("--url", help="Add new media url")		
+	parser.add_argument("--name", help="Add new media name ")		
+	parser.add_argument("--id", type=int, help="ID for media")		
+	parser.add_argument("words", nargs="*", help="words referenced in media")		
+	args=parser.parse_args()
+
+	s = Session()
+	if args.add:
+		if not args.name:
+			raise Exception('--name required')
+		if not args.url:
+			raise Exception('--url required')
+		nmed=Media(name=args.name,url=args.url)
+		s.add(nmed)
+		s.commit()
+
+	if args.id:
+		media=s.query(Media).filter(Media.id==args.id).first()
+		if not media:
+			raise Exception("Cannot find id={}".format(args.id))
+		deja=[x.root.root for x in media.encounters]	
+		now=datetime.now()
+		for word in args.words:
+			aword=s.query(Root).filter(Root.root==word).first()
+			if aword:	
+				if word in deja:
+					continue
+			else:
+				download(word)
+				aword=s.query(Root).filter(Root.root==word).first()
+			enc=Encounter(media=media,root=aword,encounter_time=now,skill=60)
+			s.add(enc)
+		s.commit()
+		
+	for media in s.query(Media).all():
+		print ("{:3d} {:<35.35s} {:s}".format( media.id,media.name,media.url))
+		for enc in media.encounters:
+			print ("             {:s}".format(enc.root.root))
+			
