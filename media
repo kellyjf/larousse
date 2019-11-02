@@ -20,12 +20,14 @@ if __name__ == "__main__":
 	args=parser.parse_args()
 
 	s = Session()
+	now=datetime.now()
+
 	if args.add:
 		if not args.name:
 			raise Exception('--name required')
 		if not args.url:
 			raise Exception('--url required')
-		nmed=Media(name=args.name,url=args.url)
+		nmed=Media(name=args.name,url=args.url,created=now)
 		s.add(nmed)
 		s.commit()
 
@@ -34,7 +36,6 @@ if __name__ == "__main__":
 		if not media:
 			raise Exception("Cannot find id={}".format(args.id))
 		deja=[x.root.root for x in media.encounters]	
-		now=datetime.now()
 		for word in args.words:
 			aword=s.query(Root).filter(Root.root==word).first()
 			if aword:	
