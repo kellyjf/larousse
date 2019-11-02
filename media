@@ -16,6 +16,7 @@ if __name__ == "__main__":
 	parser.add_argument("--url", help="Add new media url")		
 	parser.add_argument("--name", help="Add new media name ")		
 	parser.add_argument("--id", type=int, help="ID for media")		
+	parser.add_argument("--verbose", "-v", action="store_true",  help="Show encounters")		
 	parser.add_argument("words", nargs="*", help="words referenced in media")		
 	args=parser.parse_args()
 
@@ -32,9 +33,10 @@ if __name__ == "__main__":
 		s.commit()
 
 	if args.id:
-		media=s.query(Media).filter(Media.id==args.id).first()
-		if not media:
+		medialist=s.query(Media).filter(Media.id==args.id)
+		if not medialist:
 			raise Exception("Cannot find id={}".format(args.id))
+		media=medialist[0]
 		deja=[x.root.root for x in media.encounters]	
 		for word in args.words:
 			aword=s.query(Root).filter(Root.root==word).first()
@@ -47,9 +49,12 @@ if __name__ == "__main__":
 			enc=Encounter(media=media,root=aword,encounter_time=now,skill=60)
 			s.add(enc)
 		s.commit()
-		
-	for media in s.query(Media).all():
+	else:
+		medialist=s.query(Media).all()
+
+	for media in medialist:
 		print ("{:3d} {:<35.35s} {:s}".format( media.id,media.name,media.url))
-		for enc in media.encounters:
-			print ("             {:s}".format(enc.root.root))
+		if args.id or args.verbose:
+			for enc in media.encounters:
+				print ("             {:s}".format(enc.root.root))
 			
