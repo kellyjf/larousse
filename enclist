@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+
+from database import Session, Media, Root
+
+
+
+if __name__ == "__main__":
+	s=Session()
+	meds=s.query(Media).all()
+	for m in meds:
+		words=[x.root.root for x in m.encounters]
+		print("./media --id {} {}".format(m.id," ".join(words)))
+
