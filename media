@@ -48,7 +48,7 @@ if __name__ == "__main__":
 				aword=s.query(Root).filter(Root.root==word).first()
 			enc=Encounter(media=media,root=aword,encounter_time=now,skill=60)
 			s.add(enc)
-		s.commit()
+			s.commit()
 	else:
 		medialist=s.query(Media).all()
 

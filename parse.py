@@ -159,7 +159,7 @@ if __name__ == "__main__":
 	parser.add_argument("words", nargs="*", default=['avoir'])
 	parser.add_argument("--word-dir", default="words")
 	parser.add_argument("--audio-dir", default="audio")
-	parser.add_argument("--audio", action="store_true")
+	parser.add_argument("--audio", default=True, action="store_true")
 	parser.add_argument("--debug", action="store_true")
 	parser.add_argument("--force", default=False, action="store_true")
 	args=parser.parse_args()
@@ -169,8 +169,6 @@ if __name__ == "__main__":
 			os.makedirs(d)
 
 	database.create()
-	asess=database.Session()
-	qsess=database.Session()
 
 	if args.audio_dir:
 		_audio_dir=args.audio_dir
