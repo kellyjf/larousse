@@ -4,6 +4,7 @@ from database import Session, Media, Root, Encounter
 from parse import download
 from argparse import ArgumentParser as ap
 from datetime import datetime
+import locale
 
 def list():
 	res=s.query(Media).all()
@@ -52,9 +53,10 @@ if __name__ == "__main__":
 	else:
 		medialist=s.query(Media).all()
 
+	locale.setlocale(locale.LC_ALL,"fr_FR.utf8")
 	for media in medialist:
 		print ("{:3d} {:<35.35s} {:s}".format( media.id,media.name,media.url))
 		if args.id or args.verbose:
-			for enc in media.encounters:
+			for enc in sorted(media.encounters,key=lambda x: locale.strxfrm(x.root.root)):
 				print ("             {:<20.20s} {:2}".format(enc.root.root,enc.root.usages[0].phonetic))
 			
