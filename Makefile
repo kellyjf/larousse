@@ -16,18 +16,21 @@ ui_%.py : %.ui
 
 database:
 	./parse.py $(AUDIO) $(subst words/,,$(wildcard words/*))
-	for table in media encounters; do \
+	for table in media; do \
 		if [ -e backups/$${table} ] ; then \
 			sqlite3 french.sqlite "drop table $${table}";\
 			sqlite3 french.sqlite < backups/$${table};\
 		fi; \
-	done
+	done;\
+	python3 backups/enclist
 
 backup:
 	mkdir -p backups ;\
+	rm -f backups/* ;\
 	for table in media encounters; do \
 		sqlite3 french.sqlite ".dump $${table}" > backups/$${table};\
-	done
+	done;\
+	./enclist > backups/enclist
 
 test: $(UI)
 	python3 app_media.py

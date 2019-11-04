@@ -11,3 +11,4 @@ if __name__ == "__main__":
 		words=[x.root.root for x in m.encounters]
 		print("./media --id {} {}".format(m.id," ".join(words)))
 
+
