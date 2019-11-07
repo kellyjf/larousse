@@ -3,7 +3,7 @@
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker,relationship
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, func
+from sqlalchemy import create_engine, Column, Integer, String, Unicode, DateTime, ForeignKey, func
 
 
 Base=declarative_base()
@@ -15,7 +15,7 @@ class Root(Base):
 	__tablename__ = "roots"
 
 	id = Column(Integer, primary_key=True)
-	root = Column(String)
+	root = Column(Unicode)
 	importance = Column(Integer)
 	created = Column(DateTime)
 	usages = relationship("Usage",back_populates='root',cascade="all, delete-orphan")
@@ -47,10 +47,10 @@ class Usage(Base):
 	__tablename__ = "usages"
 
 	id = Column(Integer, primary_key=True)
-	address = Column(String)
+	address = Column(Unicode)
 	lienson = Column(String)
 	grammar = Column(String)
-	phonetic = Column(String)
+	phonetic = Column(Unicode)
 	root_id = Column(Integer, ForeignKey('roots.id'))
 	root = relationship("Root",back_populates='usages')
 	meanings = relationship("Meaning",back_populates='usage',cascade="all, delete-orphan")
@@ -59,7 +59,7 @@ class Meaning(Base):
 	__tablename__ = "meanings"
 
 	id = Column(Integer, primary_key=True)
-	meaning = Column(String)
+	meaning = Column(Unicode)
 	usage_id = Column(Integer, ForeignKey('usages.id'))
 	usage = relationship("Usage",back_populates='meanings')
 	examples = relationship("Example",back_populates='meaning',cascade="all, delete-orphan")
@@ -68,7 +68,7 @@ class Example(Base):
 	__tablename__ = "examples"
 
 	id = Column(Integer, primary_key=True)
-	expression = Column(String)
+	expression = Column(Unicode)
 	translation = Column(String)
 	lienson = Column(String)
 	meaning_id = Column(Integer, ForeignKey('meanings.id'))
@@ -79,7 +79,7 @@ class Expression(Base):
 
 	id = Column(Integer, primary_key=True)
 	category = Column(String)
-	expression = Column(String)
+	expression = Column(Unicode)
 	example = Column(String)
 	meaning = Column(String)
 	url = Column(String)

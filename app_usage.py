@@ -14,6 +14,7 @@ from ui_usage import Ui_Usage
 from database import *
 import os
 import parse
+import locale
 	
 class UsageDialog(QtWidgets.QDialog, Ui_Usage):
 	def __init__(self, parent=None, word=None, session=None):
@@ -181,7 +182,7 @@ if __name__ == "__main__":
 	import sys
 	import signal
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
-
+	locale.setlocale('fr_FR.utf8')
 	app = QtWidgets.QApplication(sys.argv)
 	if len(sys.argv)>1:
 		win=UsageDialog(word=sys.argv[1])

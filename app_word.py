@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from ui_word import Ui_Word
 import time
+import locale
 from app_work import Web
 from app_usage import UsageDialog
 from app_encounter import EncounterDialog
@@ -98,6 +99,7 @@ class Word(QtWidgets.QDialog, Ui_Word):
 	def search(self):
 		snip=self.wordLine.text()
 		self.words=self.session.query(Root).filter(Root.root.like("%{}%".format(snip))).order_by(Root.root).all()
+		self.words=sorted(self.words, key=lambda r: locale.strxfrm(r.root))
 		
 		for _ in range(self.wordTable.rowCount()):
 			self.wordTable.removeRow(0)
@@ -123,6 +125,11 @@ class Word(QtWidgets.QDialog, Ui_Word):
 
 if __name__ == "__main__":
 	import sys
+	import signal
+
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
+	locale.setlocale(locale.LC_ALL,'fr_FR.utf8')
+
 	app = QtWidgets.QApplication(sys.argv)
 	win=Word()
 	win.show()

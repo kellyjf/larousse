@@ -22,7 +22,7 @@ database:
 			sqlite3 french.sqlite < backups/$${table};\
 		fi; \
 	done;\
-	python3 backups/enclist
+	bash backups/enclist
 
 backup:
 	mkdir -p backups ;\
@@ -33,10 +33,10 @@ backup:
 	./enclist > backups/enclist
 
 test: $(UI)
-	python3 app_media.py
+	python3 app_usage.py
+	#python3 app_media.py
 	#python3 app_encounter.py
 	#python3 app_word.py
 	#python3 app_expression.py
-	#python3 app_usage.py
 	#python3 app_vowels.py
 

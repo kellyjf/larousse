@@ -5,6 +5,8 @@ from parse import download
 from argparse import ArgumentParser as ap
 from datetime import datetime
 import locale
+#from prompt_toolkit import prompt as pr
+#from prompt_toolkit.completion import FuzzyWordCompleter as fwc
 
 def list():
 	res=s.query(Media).all()
@@ -59,4 +61,6 @@ if __name__ == "__main__":
 		if args.id or args.verbose:
 			for enc in sorted(media.encounters,key=lambda x: locale.strxfrm(x.root.root)):
 				print ("             {:<20.20s} {:2}".format(enc.root.root,enc.root.usages[0].phonetic))
-			
+
+	#mq=pr('Select Media: ',completer=fwc([x.name for x in medialist]))
+
