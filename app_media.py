@@ -15,6 +15,7 @@ from app_encounter import EncounterDialog
 from app_usage import UsageDialog
 from database import Media, Session, Encounter, Root
 from datetime import datetime
+import locale
 
 class MediaDialog(QtWidgets.QDialog, Ui_Media):
 	def __init__(self, parent=None):
@@ -22,7 +23,7 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 		self.setupUi(self)
 		self.session=Session()
 		self.usage=UsageDialog(session=self.session)
-		self.roots=self.session.query(Root).order_by(Root.root).all()
+		self.roots=sorted(self.session.query(Root).order_by(Root.root).all(), key=lambda r:locale.strxfrm(r.root))
 		self.media=self.session.query(Media).order_by(Media.name).all()
 
 		self.encDialog=EncounterDialog(self)
@@ -150,6 +151,10 @@ class MediaDialog(QtWidgets.QDialog, Ui_Media):
 			self.mediaTable.setCurrentCell(0,0)
 if __name__ == "__main__":
 	import sys
+	import signal
+
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
+	locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
 	app = QtWidgets.QApplication(sys.argv)
 	win=MediaDialog()
 	win.show()
