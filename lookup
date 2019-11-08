@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+
+from database import Session, Media, Root, Encounter
+from parse import download
+from argparse import ArgumentParser as ap
+from datetime import datetime
+import locale
+
+def print_root(root):
+	for usage in root.usages:
+		phon=usage.phonetic or " "
+		gram=usage.grammar or "?"
+		print("{:15.15s} {:10.10s} {:s}".format(usage.address,phon,gram))
+		for meaning in usage.meanings:
+			for example in meaning.examples:
+				print("    {:35.35s} | {:35.35s}".format(
+					example.expression,
+					example.translation))
+if __name__ == "__main__":
+	parser=ap()
+	parser.add_argument("words", nargs="*", help="words referenced in media")		
+	args=parser.parse_args()
+
+	s = Session()
+	now=datetime.now()
+
+	for word in args.words:
+		roots=s.query(Root).filter(Root.root.like("%{}%".format(word))).all()
+		for root in roots:
+			print_root(root)
