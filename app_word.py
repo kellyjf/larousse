@@ -108,6 +108,16 @@ class Word(QtWidgets.QDialog, Ui_Word):
 			self.wordTable.insertRow(cnt)
 			cell=QtWidgets.QTableWidgetItem(root.root)
 			cell.setData(QtCore.Qt.UserRole, root)
+			red=green=blue=255
+			if root.usages and root.usages[0].grammar:
+				gram=root.usages[0].grammar
+				if 'masc' in gram:
+					red = red-25
+					green = green-25
+				if 'minin' in gram:
+					green = green -25
+					blue = blue - 25
+			cell.setBackground(QtGui.QColor(red,green,blue))
 			self.wordTable.setItem(cnt,0, cell)
 			self.wordTable.setItem(cnt,1, QtWidgets.QTableWidgetItem(root.importance))
 			# Calculate skill and date from encounters
