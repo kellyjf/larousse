@@ -16,6 +16,7 @@ def list():
 if __name__ == "__main__":
 	parser=ap()
 	parser.add_argument("--add", action="store_true",  help="Add new media")		
+	parser.add_argument("--like", help="Name filter")		
 	parser.add_argument("--url", help="Add new media url")		
 	parser.add_argument("--name", help="Add new media name ")		
 	parser.add_argument("--id", type=int, help="ID for media")		
@@ -52,6 +53,8 @@ if __name__ == "__main__":
 			enc=Encounter(media=media,root=aword,encounter_time=now,skill=60)
 			s.add(enc)
 			s.commit()
+	elif args.like:
+		medialist=s.query(Media).filter(Media.name.like("%{}%".format(args.like)))
 	else:
 		medialist=s.query(Media).all()
 
